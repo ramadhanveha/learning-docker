@@ -1,0 +1,62 @@
+version: "3.9"
+
+# name bebas
+name: my-wise-word-compose
+
+# kumpulan service
+services:
+  # 1.app service section
+  app:
+    container_name: go_service
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_NAME=${DB_NAME}
+      - DB_PORT=${DB_PORT}
+    env_file:
+      - .env
+    build:
+      context: ./go-file/ #nama foldernya 
+      dockerfile: Dockerfile
+    depends_on:
+      postgresdb:
+        condition: service_healthy
+    ports:
+      - 9911:78
+    networks:
+      - netwcc
+  
+  # 3. postgre
+  postgresdb : 
+    image: postgres:latest
+    container_name: database
+    # 3.1 bikin dulu di .env 
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASS}
+      - POSTGRES_DB=${DB_NAME}
+      - DATABASE_HOST=${DB_HOST}
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - '5432:5434'
+    # perlu set di compose, perlu daftarkan volume 
+    volumes:
+      - volwwc:/var/lib/postgresql/data
+    networks:
+      - netwcc
+
+#4. penanda untuk volume
+volumes:
+  volwwc:
+
+# 2. 
+networks:
+  netwcc:
+    driver: bridge
