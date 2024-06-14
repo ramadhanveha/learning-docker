@@ -41,7 +41,7 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	e.POST("/ping", func(c echo.Context) error {
+	e.GET("/ping", func(c echo.Context) error {
 		query := `INSERT INTO veha_access_log (timestamp) VALUES (NOW())`
 		_, err := db.Exec(query)
 		if err != nil {
